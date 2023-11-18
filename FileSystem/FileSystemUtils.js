@@ -3,7 +3,7 @@ import { PermissionsAndroid, Platform, } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-var SyncDirectoryPath = '';
+var SyncDirectoryPath = RNFS.DownloadDirectoryPath + '/MediaSync';
 
 
 
@@ -73,6 +73,11 @@ function GetCacheFolderPath() {
     return RNFS.CachesDirectoryPath;
 }
 
+function GetStorageRootPath(){
+    return RNFS.ExternalStorageDirectoryPath;
+}
+
+
 /**
  * Create a folder with the specified path.
  * @async
@@ -80,7 +85,7 @@ function GetCacheFolderPath() {
  */
 async function CreateDownloadsFolder(path = "MediaSync") {
     try {
-        await RNFS.mkdir(path);
+        await RNFS.mkdir(RNFS.DownloadDirectoryPath + '/' + path);
     } catch (error) {
         console.warn(error);
     }
@@ -101,6 +106,17 @@ async function CreateDownloadsFolderIfDoesntExist(path = "MediaSync") {
         }
     } catch (error) {
         console.warn(error);
+    }
+}
+
+async function CheckDownloadsFolderExist(){
+    try{
+        let exists = await RNFS.exists(SyncDirectoryPath);
+        return exists;
+    }
+    catch(err){
+        console.warn(err)
+        return false;
     }
 }
 
@@ -150,19 +166,27 @@ async function readAudioFiles(directoryPath) {
  */
 async function askForStoragePermissions() {
     try {
-        const permissions = await PermissionsAndroid.requestMultiple([
-            'android.permission.WRITE_EXTERNAL_STORAGE',
-            'android.permission.READ_EXTERNAL_STORAGE'
-        ]);
+        let granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO
+            ,
+            {
+              title: 'Audio files permissions',
+              message:
+                'Media sync client needs access to your storage ',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+        return granted === PermissionsAndroid.RESULTS.GRANTED
 
-        const readPermissionGranted = permissions['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED;
-        const writePermissionGranted = permissions['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED;
-        console.log(`Read: ${readPermissionGranted} Write: ${writePermissionGranted}`);
-        return readPermissionGranted && writePermissionGranted;
-    } catch (error) {
-        console.warn("Error requesting storage permissions:", error);
+
+    } catch (err) {
+        console.warn(err);
+        return false;
     }
 }
+
 
 
 
@@ -174,18 +198,35 @@ async function askForStoragePermissions() {
  * @returns {Promise<boolean>} A Promise that resolves to a boolean value indicating whether both read and write permissions are granted.
  */
 async function checkStoragePermissions() {
-    const readPermission = await PermissionsAndroid.check('android.permission.READ_EXTERNAL_STORAGE')
-    const writePermission = await PermissionsAndroid.check('android.permission.WRITE_EXTERNAL_STORAGE');
-    console.log(`Read: ${readPermission} Write: ${writePermission}`);
-    return readPermission && writePermission;
+    const readPermission = await PermissionsAndroid.check('android.permission.READ_MEDIA_AUDIO')
+    return readPermission
 }
+
+async function createFileHierarchyFromName(fileName = '') {
+    const dirs = fileName.split('/');
+    let dirExists = false;
+    let path = '';
+  
+    for (let i = 0; i < dirs.length - 1; i++) {
+      path += `/${dirs[i]}`;
+      dirExists = await RNFS.exists(path);
+      if (!dirExists) {
+        try {
+          await RNFS.mkdir(path);
+          console.log(`Directory '${path}' created!`);
+        } catch (err) {
+          console.error(`Error creating directory '${path}': ${err}`);
+        }
+      }
+    }
+  }
 
 
 
 
 export {
     GetCacheFolderPath, CreateDownloadsFolder, CreateDownloadsFolderIfDoesntExist, readAudioFiles,
-    readDirectory, checkStoragePermissions, askForStoragePermissions, setSyncDirectory, getSyncDirectoryAsyncStorage, 
-    saveSyncDirectoryAsyncStorage
+    readDirectory, checkStoragePermissions, askForStoragePermissions, setSyncDirectory, getSyncDirectoryAsyncStorage,
+    saveSyncDirectoryAsyncStorage, GetStorageRootPath, SyncDirectoryPath, CheckDownloadsFolderExist, createFileHierarchyFromName
 
 }

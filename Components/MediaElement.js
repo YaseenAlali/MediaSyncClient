@@ -1,5 +1,7 @@
 import SoundPlayer from "react-native-sound-player";
-import { StreamFileRequest } from "../API/Requests";
+import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
+import { DownloadFile } from "../API/FileTransfer";
+import { CheckDownloadsFolderExist, SyncDirectoryPath, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
 
@@ -28,9 +30,24 @@ export class MediaElement extends PureComponent {
         }
     }
 
+    handleDownloadPress(fileName) {
+        try {
+            url = DownloadFileRequest(fileName);
+            console.log(url)
+            console.log(SyncDirectoryPath);
+            CheckDownloadsFolderExist().then((res) => console.log(res))
+            // createFileHierarchyFromName(SyncDirectoryPath)
+            DownloadFile(url, SyncDirectoryPath, fileName);
+
+        }
+        catch (error) {
+            console.warn(error)
+        }
+    }
+
     render() {
         const item = this.props.item;
-        console.log(item)
+        // console.log(item)
         const itemSeperated = item.split('/')
         const fileName = itemSeperated[itemSeperated.length - 1];
         const catogry = itemSeperated[1]
@@ -43,7 +60,7 @@ export class MediaElement extends PureComponent {
                     <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress(item)}}>
                         <Text>Stream</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: 'white', borderWidth: 1, margin: 5 }} onPress={() => { }}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: 'white', borderWidth: 1, margin: 5 }} onPress={() => {this.handleDownloadPress(item) }}>
                         <Text>Download</Text>
                     </TouchableOpacity>
                 </View>

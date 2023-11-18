@@ -34,12 +34,12 @@ async function StreamFileRequest(fileName){
       return url;
 }
 
-async function DownloadFileRequest(fileName){
+function DownloadFileRequest(fileName){
     const url = `${ServerAddress}${Requests.download}?file=${fileName}`;
-
+    return url;
 }
 
 
 
 
-export {ServerAddress, ListMediaElements, StreamFileRequest}
+export {ServerAddress, ListMediaElements, StreamFileRequest, DownloadFileRequest}

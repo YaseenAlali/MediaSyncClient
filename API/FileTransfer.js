@@ -1,4 +1,7 @@
 import RNFetchBlob from 'rn-fetch-blob';
+import { createFileHierarchyFromName } from '../FileSystem/FileSystemUtils';
+var RNFS = require('react-native-fs')
+
 
 /**
  * Downloads a file from the given URL and saves it to the specified path
@@ -8,12 +11,13 @@ import RNFetchBlob from 'rn-fetch-blob';
  * @param {string} path - The local path where the downloaded file should be saved.
  * @returns {Promise<boolean>} A Promise that resolves when the file is successfully downloaded and saved.
  */
-async function DownloadFile(url, path) {
+async function DownloadFileTwo(url, path) {
   try {
     const response = await RNFetchBlob.config({
       fileCache: true,
       path: path,
     }).fetch('GET', url);
+
 
 
     if (response.info().status === 200) {
@@ -28,5 +32,25 @@ async function DownloadFile(url, path) {
   }
 }
 
+function DownloadFile(url, path, name = '') {
 
-async function UploadFile(url, path){}
+  let filePath = path + name;
+  console.log(filePath)
+  createFileHierarchyFromName(filePath).then(() => {
+    RNFS.downloadFile({
+      fromUrl: url,
+      toFile: filePath,
+    }).promise.then((r) => {
+      console.log(r.statusCode)
+    });
+  })
+}
+
+
+
+
+async function UploadFile(url, path) { }
+
+
+
+export { DownloadFile }

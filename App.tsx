@@ -8,6 +8,7 @@
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  PermissionsAndroid,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -25,6 +26,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { ServerMedia } from './Screens/ServerMedia';
+import { askForStoragePermissions, CreateDownloadsFolderIfDoesntExist, GetStorageRootPath } from './FileSystem/FileSystemUtils';
+import { useEffect } from 'react';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -59,11 +62,20 @@ function Section({children, title}: SectionProps): JSX.Element {
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
+  useEffect(() => {
+    askForStoragePermissions().then((result) => {
+      console.log(GetStorageRootPath());
+    })
+    CreateDownloadsFolderIfDoesntExist().then(() => console.log("Created directory"));
+  }, [])
+  
+
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
   return (
+    // <View/>
     <ServerMedia></ServerMedia>
     // <SafeAreaView style={backgroundStyle}>
     //   <StatusBar
