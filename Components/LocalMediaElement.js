@@ -54,6 +54,18 @@ export class LocalMediaElement extends PureComponent {
     //     }
     // }
 
+    handlePlayPress(fileName = ''){
+        try{
+            SoundPlayer.playUrl(fileName);
+            this.setState({
+                isStreaming : true
+            });
+        }
+        catch(error){
+            console.warn(error)
+        }
+    }
+
     render() {
         const item = this.props.item;
         // console.log(item)
@@ -66,7 +78,8 @@ export class LocalMediaElement extends PureComponent {
                     <View style={{ flex: 0.75 }}>
                         <Text numberOfLines={3}>{fileName}</Text>
                     </View>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => {}}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} 
+                    onPress={() => {this.handlePlayPress(item)}}>
                         <Text>Play</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => { }}>
