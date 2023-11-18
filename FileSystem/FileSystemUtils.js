@@ -233,6 +233,30 @@ async function checkFileExists(fileName = ''){
     }
 }
 
+async function ListFilesRecursive(DirPath) {
+    const audioExtensions = ['mp3', 'wav', 'aac', 'm4a', 'opus', 'flac'];
+    let audioFiles = [];
+  
+    async function traverseDir(dirPath) {
+      const items = await RNFS.readDir(dirPath);
+  
+      for (let item of items) {
+        if (item.isFile()) {
+          const fileExtension = item.name.split('.').pop();
+          if (audioExtensions.includes(fileExtension)) {
+            audioFiles.push(item.path);
+          }
+        } else if (item.isDirectory()) {
+          await traverseDir(item.path);
+        }
+      }
+    }
+  
+    await traverseDir(DirPath);
+  
+    return audioFiles;
+  }
+
 
 
 
@@ -240,6 +264,6 @@ export {
     GetCacheFolderPath, CreateDownloadsFolder, CreateDownloadsFolderIfDoesntExist, readAudioFiles,
     readDirectory, checkStoragePermissions, askForStoragePermissions, setSyncDirectory, getSyncDirectoryAsyncStorage,
     saveSyncDirectoryAsyncStorage, GetStorageRootPath, SyncDirectoryPath, CheckDownloadsFolderExist, createFileHierarchyFromName
-    ,checkFileExists
+    ,checkFileExists, ListFilesRecursive
 
 }

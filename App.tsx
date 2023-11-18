@@ -28,6 +28,11 @@ import {
 import { ServerMedia } from './Screens/ServerMedia';
 import { askForStoragePermissions, CreateDownloadsFolderIfDoesntExist, GetStorageRootPath } from './FileSystem/FileSystemUtils';
 import { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { ClientMedia } from './Screens/ClientMedia';
+
+
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -59,6 +64,10 @@ function Section({children, title}: SectionProps): JSX.Element {
   );
 }
 
+const Tab = createBottomTabNavigator();
+
+
+
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -75,8 +84,15 @@ function App(): JSX.Element {
   };
 
   return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Server" component={ServerMedia} />
+        <Tab.Screen name="Device" component={ClientMedia} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  // );
     // <View/>
-    <ServerMedia></ServerMedia>
+    // <ServerMedia></ServerMedia>
     // <SafeAreaView style={backgroundStyle}>
     //   <StatusBar
     //     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
