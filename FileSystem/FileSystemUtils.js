@@ -222,11 +222,24 @@ async function createFileHierarchyFromName(fileName = '') {
   }
 
 
+async function checkFileExists(fileName = ''){
+    try{
+        let exists = await RNFS.exists(fileName);
+        return exists;
+    }
+    catch(error){
+        console.warn(error)
+        return false;
+    }
+}
+
+
 
 
 export {
     GetCacheFolderPath, CreateDownloadsFolder, CreateDownloadsFolderIfDoesntExist, readAudioFiles,
     readDirectory, checkStoragePermissions, askForStoragePermissions, setSyncDirectory, getSyncDirectoryAsyncStorage,
     saveSyncDirectoryAsyncStorage, GetStorageRootPath, SyncDirectoryPath, CheckDownloadsFolderExist, createFileHierarchyFromName
+    ,checkFileExists
 
 }

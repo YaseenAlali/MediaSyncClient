@@ -1,7 +1,7 @@
 import SoundPlayer from "react-native-sound-player";
 import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
 import { DownloadFile } from "../API/FileTransfer";
-import { CheckDownloadsFolderExist, SyncDirectoryPath, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
+import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
 
@@ -12,6 +12,15 @@ export class MediaElement extends PureComponent {
     }
     state = {
         isStreaming: false,
+        fileExists : false,
+    }
+
+    componentDidMount(){
+        checkFileExists(SyncDirectoryPath + this.props.item).then((result) => {
+            this.setState({
+                fileExists : result
+            });
+        })
     }
 
     handleStreamPress(fileName){
@@ -60,7 +69,7 @@ export class MediaElement extends PureComponent {
                     <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress(item)}}>
                         <Text>Stream</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: 'white', borderWidth: 1, margin: 5 }} onPress={() => {this.handleDownloadPress(item) }}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => {this.handleDownloadPress(item) }}>
                         <Text>Download</Text>
                     </TouchableOpacity>
                 </View>
