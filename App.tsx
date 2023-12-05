@@ -31,6 +31,7 @@ import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ClientMedia } from './Screens/ClientMedia';
+import NavigationTabs from './navigation/Tabs';
 
 
 
@@ -85,10 +86,11 @@ function App(): JSX.Element {
 
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+        <NavigationTabs></NavigationTabs>
+      {/* <Tab.Navigator>
         <Tab.Screen name="Server" component={ServerMedia} />
         <Tab.Screen name="Device" component={ClientMedia} />
-      </Tab.Navigator>
+      </Tab.Navigator> */}
     </NavigationContainer>
   // );
     // <View/>

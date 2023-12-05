@@ -33,7 +33,7 @@ export class MediaElement extends PureComponent {
     }
 
     componentDidMount() {
-        checkFileExists(SyncDirectoryPath + this.props.item).then((result) => {
+        checkFileExists(SyncDirectoryPath + this.props.item.item).then((result) => {
             this.setState({
                 fileExists: result
             });
