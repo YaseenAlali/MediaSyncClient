@@ -1,20 +1,22 @@
 import { ListMediaElements } from "../API/Requests";
 import {pickDirectory} from 'react-native-document-picker'
 const { PureComponent, createRef } = require("react");
-const { View, Text, FlatList, TouchableOpacity } = require("react-native");
+const { View, Text, FlatList, TouchableOpacity, ActivityIndicator } = require("react-native");
 import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
 
 export class ServerMedia extends PureComponent {
     state = {
         MediaElementsFetched: false,
-        items: []
+        items: [],
+        refreshing : false,
     }
 
     constructor(props){
         super(props);
         this.StreamingItem = createRef();
         this._onStreamButtonPress = this._onStreamButtonPress.bind(this);
+        this._onRefresh = this._onRefresh.bind(this);
         this.cellRefs = {}
     }
 
@@ -26,7 +28,7 @@ export class ServerMedia extends PureComponent {
         console.log(this.StreamingItem.current)
     }
 
-    componentDidMount() {
+    loadItems(){
         ListMediaElements().then((mediaListRequestResponse) => {
             if (mediaListRequestResponse.length == 0) {
                 throw new Error("Request did not return any result");
@@ -42,6 +44,18 @@ export class ServerMedia extends PureComponent {
                 console.warn(error)
             }
         })
+    }
+
+    componentDidMount() {
+        this.loadItems()
+    }
+
+    _onRefresh(){
+        this.setState({
+            MediaElementsFetched : false,
+            items : []
+        });
+        this.loadItems();
     }
 
     _renderItem({ item }) {
@@ -81,7 +95,7 @@ export class ServerMedia extends PureComponent {
         if (!this.state.MediaElementsFetched) {
             return (
                 <View>
-                    <Text>Not loaded</Text>
+                    <ActivityIndicator size={40} color={'purple'}></ActivityIndicator>
                 </View>
             )
         }
@@ -103,7 +117,8 @@ export class ServerMedia extends PureComponent {
                     windowSize={10}
                     initialNumToRender={3}
                     maxToRenderPerBatch={10}
-
+                    onRefresh={this._onRefresh}
+                    refreshing={this.state.refreshing}
                 ></FlatList>
             </View>
         )
