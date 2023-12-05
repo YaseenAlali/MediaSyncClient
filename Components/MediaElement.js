@@ -11,18 +11,17 @@ export class MediaElement extends PureComponent {
         this.audio = null;
     }
     state = {
-        isStreaming: false,
+        isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
         fileExists : false,
     }
 
     startPlaying(){}
 
     stopPlaying(){
-        console.log("Stopped");
+        console.log("Stopped", this.props.item.index);
         this.setState({
             isStreaming : false
         });
-        SoundPlayer.stop();
     }
 
     componentDidMount(){
@@ -33,17 +32,27 @@ export class MediaElement extends PureComponent {
         })
     }
 
-    handleStreamPress(fileName){
+    playVideo(){
         try{
-            console.log("PRESSED", this.props)
-            StreamFileRequest(fileName).then(async (url) => {
+            const item = this.props.item.item;
+            StreamFileRequest(item).then(async (url) => {
                 SoundPlayer.playUrl(url);
+                console.log(url);
                 this.setState({
                     isStreaming : true
                 })
+                this.props.onStreamButtonPress(this.props.item.index)
             });
-            this.props.onStreamButtonPress(this.props.item.index)
 
+        }
+        catch(error){
+            console.warn(error)
+        }
+    }
+
+    handleStreamPress(){
+        try{
+            this.playVideo();
         }
         catch(error){
             console.warn(error)
@@ -77,7 +86,7 @@ export class MediaElement extends PureComponent {
                     <View style={{ flex: 0.75 }}>
                         <Text numberOfLines={3}>{fileName}</Text>
                     </View>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress(item)}}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress()}}>
                         <Text>Stream</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => {this.handleDownloadPress(item) }}>

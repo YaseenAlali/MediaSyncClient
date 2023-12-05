@@ -4,6 +4,8 @@ const { PureComponent, createRef } = require("react");
 const { View, Text, FlatList, TouchableOpacity, ActivityIndicator } = require("react-native");
 import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
+import PlayerControl from "../Components/PlayerControl";
+import SoundPlayer from "react-native-sound-player";
 
 export class ServerMedia extends PureComponent {
     state = {
@@ -17,13 +19,18 @@ export class ServerMedia extends PureComponent {
         this.StreamingItem = createRef();
         this._onStreamButtonPress = this._onStreamButtonPress.bind(this);
         this._onRefresh = this._onRefresh.bind(this);
-        this.cellRefs = {}
+        this.onNext = this.onNext.bind(this);
+        this.onPrev = this.onPrev.bind(this);
+        this.GetIsItemBeingPlayed = this.GetIsItemBeingPlayed.bind(this);
+        this.cellRefs = {};
+        this.PlayerControlRef = null;
     }
 
     _onStreamButtonPress(itemIndex){
-        if (this.StreamingItem.current){
+        if (this.StreamingItem.current != null){
             this.cellRefs[this.StreamingItem.current].stopPlaying()
         }
+        this.PlayerControlRef.togglePlayState();
         this.StreamingItem.current = itemIndex;
         console.log(this.StreamingItem.current)
     }
@@ -66,9 +73,17 @@ export class ServerMedia extends PureComponent {
              ref={(ref) => {
                 this.cellRefs[item.index] = ref;
               }}
+              GetIsItemBeingPlayed = {this.GetIsItemBeingPlayed}
              >
              </MediaElement>
         )
+    }
+
+    GetIsItemBeingPlayed(index){
+        if (this.StreamingItem.current != null){
+            return index == this.StreamingItem.current;
+        }
+        return false;
     }
 
     handleDirectoryPicketButtonPress(){
@@ -90,6 +105,31 @@ export class ServerMedia extends PureComponent {
         })
     }
 
+    onPlay(){
+        SoundPlayer.resume();
+    }
+    onPause(){
+        SoundPlayer.pause()
+    }
+    onNext(){
+        const count = this.state.items.length;
+        if (this.StreamingItem.current != null){
+            const itemIndex = this.StreamingItem.current;
+            if (itemIndex < count - 1){
+                this.cellRefs[itemIndex + 1].playVideo();
+            }
+        }
+    }
+    onPrev(){
+            console.log("pressed")
+            if (this.StreamingItem.current != null){
+            const itemIndex = this.StreamingItem.current;
+            if (itemIndex > 0){
+                this.cellRefs[itemIndex - 1].playVideo();
+            }
+        }
+    }
+
 
     render() {
         if (!this.state.MediaElementsFetched) {
@@ -107,6 +147,13 @@ export class ServerMedia extends PureComponent {
                     <TouchableOpacity style={{flex : 1}} onPress={() => {this.handleDirectoryPicketButtonPress()}}></TouchableOpacity>
                 </View>
                 }
+                <PlayerControl 
+                    ref={(ref) => {this.PlayerControlRef = ref}}
+                    onNext = {this.onNext} 
+                    onPause = {this.onPause} 
+                    onPlay = {this.onPlay} 
+                    onPrev = {this.onPrev}    
+                ></PlayerControl>
                 <FlatList
                     renderItem={({ item }) => this._renderItem({ item })}
                     data={this.state.items}
