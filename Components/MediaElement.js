@@ -8,53 +8,67 @@ const { View, Text, TouchableOpacity } = require("react-native");
 export class MediaElement extends PureComponent {
     constructor(props) {
         super(props),
-        this.audio = null;
+            this.audio = null;
     }
     state = {
         isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
-        fileExists : false,
+        fileExists: false,
     }
 
-    startPlaying(){}
+    startPlaying() { }
 
-    stopPlaying(){
+    stopPlaying() {
         console.log("Stopped", this.props.item.index);
         this.setState({
-            isStreaming : false
+            isStreaming: false
         });
+        this.removeSub();
+        console.log(this.audio)
     }
 
-    componentDidMount(){
+    removeSub(){
+        if (this.audio && this.audio.remove){
+            this.audio.remove();
+        }
+    }
+
+    componentDidMount() {
         checkFileExists(SyncDirectoryPath + this.props.item).then((result) => {
             this.setState({
-                fileExists : result
+                fileExists: result
             });
         })
     }
+    
 
-    playVideo(){
-        try{
+    playVideo() {
+        try {
+            this.removeSub();
             const item = this.props.item.item;
             StreamFileRequest(item).then(async (url) => {
                 SoundPlayer.playUrl(url);
                 console.log(url);
                 this.setState({
-                    isStreaming : true
+                    isStreaming: true
                 })
-                this.props.onStreamButtonPress(this.props.item.index)
+                this.props.onStreamButtonPress(this.props.item.index);
+                this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
+                    console.log('finished playing', success, this.props.item.index);
+                    this.props.onMediaFinishedPlaying();
+                })
             });
 
         }
-        catch(error){
+        catch (error) {
             console.warn(error)
         }
     }
 
-    handleStreamPress(){
-        try{
+    handleStreamPress() {
+        try {
             this.playVideo();
         }
-        catch(error){
+        catch (error) {
             console.warn(error)
         }
     }
@@ -86,10 +100,10 @@ export class MediaElement extends PureComponent {
                     <View style={{ flex: 0.75 }}>
                         <Text numberOfLines={3}>{fileName}</Text>
                     </View>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress()}}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress() }}>
                         <Text>Stream</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => {this.handleDownloadPress(item) }}>
+                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => { this.handleDownloadPress(item) }}>
                         <Text>Download</Text>
                     </TouchableOpacity>
                 </View>
