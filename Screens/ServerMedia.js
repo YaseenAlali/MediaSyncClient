@@ -1,6 +1,6 @@
 import { ListMediaElements } from "../API/Requests";
 import {pickDirectory} from 'react-native-document-picker'
-const { PureComponent } = require("react");
+const { PureComponent, createRef } = require("react");
 const { View, Text, FlatList, TouchableOpacity } = require("react-native");
 import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
@@ -11,12 +11,27 @@ export class ServerMedia extends PureComponent {
         items: []
     }
 
+    constructor(props){
+        super(props);
+        this.StreamingItem = createRef();
+        this._onStreamButtonPress = this._onStreamButtonPress.bind(this);
+        this.cellRefs = {}
+    }
+
+    _onStreamButtonPress(itemIndex){
+        if (this.StreamingItem.current){
+            this.cellRefs[this.StreamingItem.current].stopPlaying()
+        }
+        this.StreamingItem.current = itemIndex;
+        console.log(this.StreamingItem.current)
+    }
+
     componentDidMount() {
         ListMediaElements().then((mediaListRequestResponse) => {
             if (mediaListRequestResponse.length == 0) {
                 throw new Error("Request did not return any result");
             }
-            const newItems = JSON.parse(mediaListRequestResponse)["AudioFiles"]
+            const newItems = JSON.parse(mediaListRequestResponse)["AudioFiles"].map((item, index) => ({index, item}));
             this.setState({
                 MediaElementsFetched: true,
                 items: newItems
@@ -31,7 +46,14 @@ export class ServerMedia extends PureComponent {
 
     _renderItem({ item }) {
         return(
-            <MediaElement item={item}></MediaElement>
+            <MediaElement
+             item={item}
+             onStreamButtonPress={this._onStreamButtonPress}
+             ref={(ref) => {
+                this.cellRefs[item.index] = ref;
+              }}
+             >
+             </MediaElement>
         )
     }
 
@@ -78,9 +100,9 @@ export class ServerMedia extends PureComponent {
                     getItemLayout={(data, index) => (
                         { length: 50, offset: 50 * index, index }
                     )}
-                    windowSize={50}
+                    windowSize={10}
                     initialNumToRender={3}
-                    maxToRenderPerBatch={50}
+                    maxToRenderPerBatch={10}
 
                 ></FlatList>
             </View>

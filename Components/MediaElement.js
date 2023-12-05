@@ -15,6 +15,16 @@ export class MediaElement extends PureComponent {
         fileExists : false,
     }
 
+    startPlaying(){}
+
+    stopPlaying(){
+        console.log("Stopped");
+        this.setState({
+            isStreaming : false
+        });
+        SoundPlayer.stop();
+    }
+
     componentDidMount(){
         checkFileExists(SyncDirectoryPath + this.props.item).then((result) => {
             this.setState({
@@ -25,13 +35,14 @@ export class MediaElement extends PureComponent {
 
     handleStreamPress(fileName){
         try{
-            console.log("PRESSED")
+            console.log("PRESSED", this.props)
             StreamFileRequest(fileName).then(async (url) => {
                 SoundPlayer.playUrl(url);
                 this.setState({
                     isStreaming : true
                 })
             });
+            this.props.onStreamButtonPress(this.props.item.index)
 
         }
         catch(error){
@@ -55,7 +66,7 @@ export class MediaElement extends PureComponent {
     }
 
     render() {
-        const item = this.props.item;
+        const item = this.props.item.item;
         // console.log(item)
         const itemSeperated = item.split('/')
         const fileName = itemSeperated[itemSeperated.length - 1];
