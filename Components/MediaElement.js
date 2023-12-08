@@ -4,6 +4,8 @@ import { DownloadFile } from "../API/FileTransfer";
 import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 export class MediaElement extends PureComponent {
     constructor(props) {
@@ -26,8 +28,8 @@ export class MediaElement extends PureComponent {
         console.log(this.audio)
     }
 
-    removeSub(){
-        if (this.audio && this.audio.remove){
+    removeSub() {
+        if (this.audio && this.audio.remove) {
             this.audio.remove();
         }
     }
@@ -39,7 +41,7 @@ export class MediaElement extends PureComponent {
             });
         })
     }
-    
+
 
     playVideo() {
         try {
@@ -95,19 +97,18 @@ export class MediaElement extends PureComponent {
         const fileName = itemSeperated[itemSeperated.length - 1];
         const catogry = itemSeperated[1]
         return (
-            <View style={{ height: 50 }}>
-                <View style={{ flexDirection: 'row', height: 50 }}>
-                    <View style={{ flex: 0.75 }}>
+            <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5 }}>
+                <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View style={{ flex: 0.95 }}>
                         <Text numberOfLines={3}>{fileName}</Text>
                     </View>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} onPress={() => { this.handleStreamPress() }}>
-                        <Text>Stream</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => { this.handleDownloadPress(item) }}>
-                        <Text>Download</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
+                        <Icon color={this.state.fileExists ? 'green' : 'red'} name='download' size={30} onPress={() => this.handleDownloadPress()} style={{ marginRight: 10 }}></Icon>
+                    </View>
                 </View>
             </View>
+
         )
     }
 }
