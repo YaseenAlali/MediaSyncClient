@@ -77,7 +77,10 @@ export class ServerMedia extends PureComponent {
                 break;
             default:
                 console.log("None do nothing")
-                this.cellRefs[itemIndex].stopPlaying();
+                const cell = this.cellRefs[itemIndex];
+                if (cell){
+                    cell.stopPlaying();
+                }
                 this.PlayerControlRef.togglePlayState(false);
         }
     }
@@ -216,9 +219,9 @@ export class ServerMedia extends PureComponent {
                     getItemLayout={(data, index) => (
                         { length: 50, offset: 50 * index, index }
                     )}
-                    windowSize={10}
-                    initialNumToRender={3}
-                    maxToRenderPerBatch={10}
+                    // windowSize={10}
+                    // initialNumToRender={3}
+                    // maxToRenderPerBatch={10}
                     onRefresh={this._onRefresh}
                     refreshing={this.state.refreshing}
                 ></FlatList>

@@ -37,7 +37,7 @@ class SearchButton extends React.Component {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   {this.state.isSearchActive && (
                     <TextInput
-                      style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginRight: 10, color: 'black' }}
+                      style={{ height: 40, borderColor: 'purple', borderWidth: 1, marginRight: 10, color: 'purple' }}
                       onChangeText={text => {
                         this.setState({ searchText: text });
                         this.handleSearch(ServerMediaItems);
@@ -51,12 +51,12 @@ class SearchButton extends React.Component {
                       this.setState({ isSearchActive: true });
                     }}
                     style={{
-                      backgroundColor: '#00cc00',
+                      backgroundColor: 'purple',
                       alignItems: 'center',
                       justifyContent: 'center',
                       height: 40,
                       paddingHorizontal: 20,
-                      borderRadius: 5
+                      borderRadius: 10
                     }}
                   >
                     <Text style={{ color: 'white' }}>Search</Text>
@@ -65,12 +65,12 @@ class SearchButton extends React.Component {
                     <TouchableOpacity
                       onPress={() => this.setState({ isSearchActive: false, searchText: '', results: [] })}
                       style={{
-                        backgroundColor: 'red',
+                        backgroundColor: 'purple',
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: 40,
                         paddingHorizontal: 20,
-                        borderRadius: 5,
+                        borderRadius: 10,
                         marginLeft: 10
                       }}
                     >
