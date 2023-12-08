@@ -6,8 +6,10 @@ import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
 import PlayerControl from "../Components/PlayerControl";
 import SoundPlayer from "react-native-sound-player";
+import { ServerMediaContext } from "../Contexts/Contexts";
 
 export class ServerMedia extends PureComponent {
+    static contextType = ServerMediaContext;
     state = {
         MediaElementsFetched: false,
         items: [],
@@ -24,6 +26,7 @@ export class ServerMedia extends PureComponent {
         this.GetIsItemBeingPlayed = this.GetIsItemBeingPlayed.bind(this);
         this.getRepeatModeMode = this.getRepeatModeMode.bind(this);
         this.onMediaFinishedPlaying = this.onMediaFinishedPlaying.bind(this);
+        this.onSearchItemPressed = this.onSearchItemPressed.bind(this);
         this.cellRefs = {};
         this.PlayerControlRef = null;
         this.listRef = null;
@@ -86,9 +89,26 @@ export class ServerMedia extends PureComponent {
         return 'none';
     }
 
+    onSearchItemPressed(item){
+        if (item){
+            this.listRef.scrollToIndex({
+                index : item.index,
+                animated : true
+            });
+        }
+    }
+
     componentDidMount() {
+        this.context.setOnSearchItemPressed(() => this.onSearchItemPressed);
+
         this.loadItems()
     }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.items !== prevState.items) {
+          this.context.setServerMediaItems(this.state.items);
+        }
+      }
 
     _onRefresh() {
         this.setState({
