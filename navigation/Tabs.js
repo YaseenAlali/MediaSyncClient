@@ -94,6 +94,18 @@ function NavigationTabs() {
           <Tab.Screen
             name='Settings'
             component={SettingsScreen}
+            options={{
+              headerTitleStyle: { color: 'purple' },
+              headerBackground: () => {
+                return (
+                  <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                    <View style={{ borderColor: 'purple', borderWidth: 1, borderRadius: 25, position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+
+                    </View>
+                  </View>
+                )
+              }
+            }}
           ></Tab.Screen>
         </Tab.Navigator>
       </ClientMediaContext.Provider>

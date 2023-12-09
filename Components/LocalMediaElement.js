@@ -53,20 +53,6 @@ export class LocalMediaElement extends PureComponent {
             this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
                 this.props.onMediaFinishedPlaying();
             })
-
-            // StreamFileRequest(item).then(async (url) => {
-            //     SoundPlayer.playUrl(url);
-            //     console.log(url);
-            //     this.setState({
-            //         isStreaming: true
-            //     })
-            //     this.props.onStreamButtonPress(this.props.item.index);
-            //     this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
-            //         console.log('finished playing', success, this.props.item.index);
-            //         this.props.onMediaFinishedPlaying();
-            //     })
-            // });
-
         }
         catch (error) {
             console.warn(error)
@@ -121,65 +107,3 @@ export class LocalMediaElement extends PureComponent {
     }
 }
 
-
-// import SoundPlayer from "react-native-sound-player";
-// import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
-// import { DownloadFile } from "../API/FileTransfer";
-// import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
-// import Icon from 'react-native-vector-icons/FontAwesome';
-// const { PureComponent } = require("react");
-// const { View, Text, TouchableOpacity } = require("react-native");
-
-// export class LocalMediaElement extends PureComponent {
-//     constructor(props) {
-//         super(props);
-//         this.audio = null;
-//     }
-//     state = {
-//         isStreaming: false,
-//         fileExists: false,
-//     }
-
-//     handlePlayPress(fileName = '') {
-//         try {
-//             SoundPlayer.playUrl(fileName);
-//             this.setState({
-//                 isStreaming: true
-//             });
-//         }
-//         catch (error) {
-//             console.warn(error)
-//         }
-//     }
-//     removeSub(){}
-
-//     playAudio() {
-//         try {
-
-//         }
-//         catch (error) {
-//             console.warn(error);
-//         }
-//     }
-
-//     render() {
-//         const item = this.props.item.item;
-//         // console.log(item)
-//         const itemSeperated = item.split('/')
-//         const fileName = itemSeperated[itemSeperated.length - 1];
-//         const catogry = itemSeperated[1]
-//         return (
-//             <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius: 25 }}>
-//                 <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
-//                     <View style={{ flex: 0.95 }}>
-//                         <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
-//                     </View>
-//                     <View style={{ flexDirection: 'row' }}>
-//                         <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => { this.handlePlayPress(item) }} style={{ marginRight: 10 }}></Icon>
-//                         <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => { }} style={{ marginRight: 10 }}></Icon>
-//                     </View>
-//                 </View>
-//             </View>
-//         )
-//     }
-// }
