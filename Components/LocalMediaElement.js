@@ -4,89 +4,182 @@ import { DownloadFile } from "../API/FileTransfer";
 import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 export class LocalMediaElement extends PureComponent {
     constructor(props) {
-        super(props),
+        super(props)
         this.audio = null;
     }
     state = {
-        isStreaming: false,
-        fileExists : false,
+        isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
+        fileExists: false,
     }
 
-    // componentDidMount(){
-    //     checkFileExists(SyncDirectoryPath + this.props.item).then((result) => {
-    //         this.setState({
-    //             fileExists : result
-    //         });
-    //     })
-    // }
+    startPlaying() { }
 
-    // handleStreamPress(fileName){
-    //     try{
-    //         console.log("PRESSED")
-    //         StreamFileRequest(fileName).then(async (url) => {
-    //             SoundPlayer.playUrl(url);
-    //             this.setState({
-    //                 isStreaming : true
-    //             })
-    //         });
+    stopPlaying() {
+        console.log("Stopped", this.props.item.index);
+        this.setState({
+            isStreaming: false
+        });
+        this.removeSub();
+        console.log(this.audio)
+    }
 
-    //     }
-    //     catch(error){
-    //         console.warn(error)
-    //     }
-    // }
-
-    // handleDownloadPress(fileName) {
-    //     try {
-    //         url = DownloadFileRequest(fileName);
-    //         console.log(url)
-    //         console.log(SyncDirectoryPath);
-    //         CheckDownloadsFolderExist().then((res) => console.log(res))
-    //         // createFileHierarchyFromName(SyncDirectoryPath)
-    //         DownloadFile(url, SyncDirectoryPath, fileName);
-
-    //     }
-    //     catch (error) {
-    //         console.warn(error)
-    //     }
-    // }
-
-    handlePlayPress(fileName = ''){
-        try{
-            SoundPlayer.playUrl(fileName);
-            this.setState({
-                isStreaming : true
-            });
+    removeSub() {
+        if (this.audio && this.audio.remove) {
+            this.audio.remove();
         }
-        catch(error){
+    }
+
+    componentDidMount() {
+        checkFileExists(SyncDirectoryPath + this.props.item.item).then((result) => {
+            this.setState({
+                fileExists: result
+            });
+        })
+    }
+
+
+    playVideo() {
+        try {
+            this.removeSub();
+            const item = this.props.item.item;
+            SoundPlayer.playUrl(item);
+            this.setState({ isStreaming: true });
+            this.props.onStreamButtonPress(this.props.item.index);
+            this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
+                this.props.onMediaFinishedPlaying();
+            })
+
+            // StreamFileRequest(item).then(async (url) => {
+            //     SoundPlayer.playUrl(url);
+            //     console.log(url);
+            //     this.setState({
+            //         isStreaming: true
+            //     })
+            //     this.props.onStreamButtonPress(this.props.item.index);
+            //     this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
+            //         console.log('finished playing', success, this.props.item.index);
+            //         this.props.onMediaFinishedPlaying();
+            //     })
+            // });
+
+        }
+        catch (error) {
+            console.warn(error)
+        }
+    }
+
+    handleStreamPress() {
+        try {
+            this.playVideo();
+        }
+        catch (error) {
+            console.warn(error)
+        }
+    }
+
+    handleDownloadPress(fileName) {
+        try {
+            url = DownloadFileRequest(fileName);
+            console.log(url)
+            console.log(SyncDirectoryPath);
+            CheckDownloadsFolderExist().then((res) => console.log(res))
+            // createFileHierarchyFromName(SyncDirectoryPath)
+            DownloadFile(url, SyncDirectoryPath, fileName);
+
+        }
+        catch (error) {
             console.warn(error)
         }
     }
 
     render() {
-        const item = this.props.item;
+        const item = this.props.item.item;
         // console.log(item)
         const itemSeperated = item.split('/')
         const fileName = itemSeperated[itemSeperated.length - 1];
-        const catogry = itemSeperated[1]
+        const catogry = itemSeperated[1];
+        console.log(item)
         return (
-            <View style={{ height: 50 }}>
-                <View style={{ flexDirection: 'row', height: 50 }}>
-                    <View style={{ flex: 0.75 }}>
-                        <Text numberOfLines={3}>{fileName}</Text>
+            <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius: 25 }}>
+                <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View style={{ flex: 0.95 }}>
+                        <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
                     </View>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.isStreaming ? 'green' : 'white', borderWidth: 1, margin: 5 }} 
-                    onPress={() => {this.handlePlayPress(item)}}>
-                        <Text>Play</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ flex: 0.125, borderColor: this.state.fileExists ? 'green' : 'red', borderWidth: 1, margin: 5 }} onPress={() => { }}>
-                        <Text>Upload</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
+                        <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => {}} style={{ marginRight: 10 }}></Icon>
+                    </View>
                 </View>
             </View>
+
         )
     }
 }
+
+
+// import SoundPlayer from "react-native-sound-player";
+// import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
+// import { DownloadFile } from "../API/FileTransfer";
+// import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
+// import Icon from 'react-native-vector-icons/FontAwesome';
+// const { PureComponent } = require("react");
+// const { View, Text, TouchableOpacity } = require("react-native");
+
+// export class LocalMediaElement extends PureComponent {
+//     constructor(props) {
+//         super(props);
+//         this.audio = null;
+//     }
+//     state = {
+//         isStreaming: false,
+//         fileExists: false,
+//     }
+
+//     handlePlayPress(fileName = '') {
+//         try {
+//             SoundPlayer.playUrl(fileName);
+//             this.setState({
+//                 isStreaming: true
+//             });
+//         }
+//         catch (error) {
+//             console.warn(error)
+//         }
+//     }
+//     removeSub(){}
+
+//     playAudio() {
+//         try {
+
+//         }
+//         catch (error) {
+//             console.warn(error);
+//         }
+//     }
+
+//     render() {
+//         const item = this.props.item.item;
+//         // console.log(item)
+//         const itemSeperated = item.split('/')
+//         const fileName = itemSeperated[itemSeperated.length - 1];
+//         const catogry = itemSeperated[1]
+//         return (
+//             <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius: 25 }}>
+//                 <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
+//                     <View style={{ flex: 0.95 }}>
+//                         <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
+//                     </View>
+//                     <View style={{ flexDirection: 'row' }}>
+//                         <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => { this.handlePlayPress(item) }} style={{ marginRight: 10 }}></Icon>
+//                         <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => { }} style={{ marginRight: 10 }}></Icon>
+//                     </View>
+//                 </View>
+//             </View>
+//         )
+//     }
+// }

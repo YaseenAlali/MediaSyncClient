@@ -103,6 +103,7 @@ export class ServerMedia extends PureComponent {
 
     componentDidMount() {
         this.context.setOnSearchItemPressed(() => this.onSearchItemPressed);
+        console.log("Used new function");
 
         this.loadItems()
     }

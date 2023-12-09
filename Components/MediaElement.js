@@ -9,8 +9,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 export class MediaElement extends PureComponent {
     constructor(props) {
-        super(props),
-            this.audio = null;
+        super(props)
+        this.audio = null;
     }
     state = {
         isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
@@ -97,10 +97,10 @@ export class MediaElement extends PureComponent {
         const fileName = itemSeperated[itemSeperated.length - 1];
         const catogry = itemSeperated[1]
         return (
-            <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius : 25 }}>
+            <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius: 25 }}>
                 <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flex: 0.95 }}>
-                        <Text style={{marginLeft : 10}}  numberOfLines={3}>{fileName}</Text>
+                        <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
                     </View>
                     <View style={{ flexDirection: 'row' }}>
                         <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>

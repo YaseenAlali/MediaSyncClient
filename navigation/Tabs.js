@@ -8,6 +8,7 @@ import { Button, TouchableOpacity, Text, View } from 'react-native'
 import SearchButton from '../Components/SearchButton';
 import { ClientMediaContext, ServerMediaContext } from '../Contexts/Contexts';
 import { useState, useEffect } from 'react'
+import { SettingsScreen } from '../Screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,19 +18,25 @@ function NavigationTabs() {
   const [onSearchItemPressed, setOnSearchItemPressed] = useState(() => () => {
     console.log("called the wrong one");
   });
+  const [onSearchItemPressedClient, setOnSearchItemPressedClient] = useState(() => () => {
+    console.log("called the wrong local one");
+  });
 
   return (
     <ServerMediaContext.Provider value={{ ServerMediaItems, setServerMediaItems, onSearchItemPressed, setOnSearchItemPressed }}>
-      <ClientMediaContext.Provider value={{ ClientMediaItems, setClientMediaItems }}>
+      <ClientMediaContext.Provider value={{ ClientMediaItems, setClientMediaItems, onSearchItemPressedClient, setOnSearchItemPressedClient }}>
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
               if (route.name === 'Server') {
-                iconName = 'server'
+                iconName = 'server';
               } else if (route.name === 'Device') {
-                iconName = 'user'
+                iconName = 'user';
+              }
+              else if (route.name === 'Settings') {
+                iconName = 'gear';
               }
 
               return <Icon name={iconName} size={size} color={color} />;
@@ -55,7 +62,7 @@ function NavigationTabs() {
               headerTitleStyle: { color: 'purple' },
               headerBackground: () => {
                 return (
-                  <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', position : 'absolute',  top: 0, bottom: 0, left: 0, right: 0}}>
+                  <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
                     <View style={{ borderColor: 'purple', borderWidth: 1, borderRadius: 25, position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
 
                     </View>
@@ -70,14 +77,24 @@ function NavigationTabs() {
             component={ClientMedia}
             options={{
               headerRight: () => (
-                <Button
-                  onPress={() => { }}
-                  title="test"
-                  color="#00cc00"
-                />
+                <SearchButton searchingServer={false}></SearchButton>
               ),
+              headerTitleStyle: { color: 'purple' },
+              headerBackground: () => {
+                return (
+                  <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                    <View style={{ borderColor: 'purple', borderWidth: 1, borderRadius: 25, position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+
+                    </View>
+                  </View>
+                )
+              }
             }}
           />
+          <Tab.Screen
+            name='Settings'
+            component={SettingsScreen}
+          ></Tab.Screen>
         </Tab.Navigator>
       </ClientMediaContext.Provider>
     </ServerMediaContext.Provider>
