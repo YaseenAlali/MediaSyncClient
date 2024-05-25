@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { AppContext } from '../Contexts/Contexts';
+import { PlayerSlider } from './PlayerSlider';
 
 class PlayerControl extends React.Component {
   constructor(props) {
@@ -14,13 +15,13 @@ class PlayerControl extends React.Component {
   static contextType = AppContext;
 
 
-  getRepeatMode(){
+  getRepeatMode() {
     const repeatMode = this.state.repeatMode;
     return repeatMode;
   }
 
   handlePlayPause = () => {
-    const {IsPlaying, setIsPlaying} = this.context;
+    const { IsPlaying, setIsPlaying } = this.context;
     setIsPlaying(!IsPlaying);
   };
 
@@ -50,6 +51,11 @@ class PlayerControl extends React.Component {
 
     return (
       <View style={styles.container}>
+        <View style={{width : '100%'}}>
+          <PlayerSlider></PlayerSlider>
+        </View>
+
+        <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'space-around', width : '100%'}}>
         <Icon name="backward" size={30} onPress={onPrev} />
         {IsPlaying ?
           (
@@ -74,6 +80,7 @@ class PlayerControl extends React.Component {
               <Icon name="stop" size={20} onPress={this.handleRepeat} />
             )
         }
+        </View>
       </View>
     );
   }
@@ -84,7 +91,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: 'purple',
     padding: 10,
