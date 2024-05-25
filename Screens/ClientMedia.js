@@ -185,14 +185,16 @@ export class ClientMedia extends PureComponent {
                         <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleDirectoryPicketButtonPress() }}></TouchableOpacity>
                     </View>
                 }
-                <PlayerControl
-                    ref={(ref) => { this.PlayerControlRef = ref }}
-                    onNext={this.onNext}
-                    onPause={this.onPause}
-                    onPlay={this.onPlay}
-                    onPrev={this.onPrev}
-                    clientPlayerControl={true}
-                ></PlayerControl>
+                {(this.context.ClientTrackIndex != -1 || this.context.ServerTrackIndex != -1) &&
+                    <PlayerControl
+                        ref={(ref) => { this.PlayerControlRef = ref }}
+                        onNext={this.onNext}
+                        onPause={this.onPause}
+                        onPlay={this.onPlay}
+                        onPrev={this.onPrev}
+                        clientPlayerControl={true}
+                    ></PlayerControl>
+                }
                 <FlatList
                     ref={(ref) => { this.listRef = ref }}
                     renderItem={({ item }) => this._renderItem({ item })}

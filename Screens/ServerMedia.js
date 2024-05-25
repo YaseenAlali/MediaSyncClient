@@ -72,7 +72,7 @@ export class ServerMedia extends PureComponent {
             default:
                 console.log("None do nothing")
                 const cell = this.cellRefs[itemIndex];
-                if (cell){
+                if (cell) {
                     cell.stopPlaying();
                 }
                 this.PlayerControlRef.togglePlayState(false);
@@ -86,11 +86,11 @@ export class ServerMedia extends PureComponent {
         return 'none';
     }
 
-    onSearchItemPressed(item){
-        if (item){
+    onSearchItemPressed(item) {
+        if (item) {
             this.listRef.scrollToIndex({
-                index : item.index,
-                animated : true
+                index: item.index,
+                animated: true
             });
         }
     }
@@ -186,14 +186,16 @@ export class ServerMedia extends PureComponent {
                         <TouchableOpacity style={{ flex: 1 }} onPress={() => { this.handleDirectoryPicketButtonPress() }}></TouchableOpacity>
                     </View>
                 }
-                <PlayerControl
-                    ref={(ref) => { this.PlayerControlRef = ref }}
-                    onNext={this.onNext}
-                    onPrev={this.onPrev}
-                    serverPlayerControl={true}
-                ></PlayerControl>
+                {(this.context.ClientTrackIndex != -1 || this.context.ServerTrackIndex != -1) &&
+                    <PlayerControl
+                        ref={(ref) => { this.PlayerControlRef = ref }}
+                        onNext={this.onNext}
+                        onPrev={this.onPrev}
+                        serverPlayerControl={true}
+                    ></PlayerControl>
+                }
                 <FlatList
-                    ref={(ref) => { this.listRef = ref}}
+                    ref={(ref) => { this.listRef = ref }}
                     renderItem={({ item }) => this._renderItem({ item })}
                     data={this.context.ServerMediaItems}
                     keyExtractor={(item, index) => index.toString()}
