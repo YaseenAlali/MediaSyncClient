@@ -1,5 +1,5 @@
 import RNFetchBlob from 'rn-fetch-blob';
-import { createFileHierarchyFromName } from '../FileSystem/FileSystemUtils';
+import { SyncDirectoryPath, createFileHierarchyFromName } from '../FileSystem/FileSystemUtils';
 var RNFS = require('react-native-fs')
 
 
@@ -56,8 +56,25 @@ async function DownloadFile(url, path, name = '') {
 
 
 
-async function UploadFile(url, path) { }
+async function UploadFile(url, path, file) {
+  try {
+    let result = await RNFetchBlob.fetch("POST", url, {
+      'Content-Type': 'multipart/form-data'
+    }, [
+      { name: 'file', data: file },
+      {
+        name: 'fileToUpload',
+        filename: file,
+        data: RNFetchBlob.wrap(path.replace('file://', ""))
+      },
+    ]);
+    return result.respInfo.status == 201;
+  } catch (error) {
+    console.warn(error);
+    return false;
+  }
+}
 
 
 
-export { DownloadFile }
+export { DownloadFile, UploadFile }

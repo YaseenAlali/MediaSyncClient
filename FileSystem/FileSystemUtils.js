@@ -244,7 +244,7 @@ async function ListFilesRecursive(DirPath) {
         if (item.isFile()) {
           const fileExtension = item.name.split('.').pop();
           if (audioExtensions.includes(fileExtension)) {
-            audioFiles.push(item.path);
+            audioFiles.push({path : item.path, name : item.name, nameWithCatogry : item.path.replace(SyncDirectoryPath + "/", '')});
           }
         } else if (item.isDirectory()) {
           await traverseDir(item.path);

@@ -49,8 +49,7 @@ export class ClientMedia extends PureComponent {
 
     loadItems() {
         ListFilesRecursive(SyncDirectoryPath).then((result) => {
-            console.log(result);
-            const newItems = result.map((item, index) => ({ index, item }));
+            const newItems = result.map((item, index) => ({ index, item : item.path, name : item.name, nameWithCatogry: item.nameWithCatogry }));
             this.setState({
                 MediaElementsFetched: true,
                 items: newItems
@@ -117,7 +116,6 @@ export class ClientMedia extends PureComponent {
     }
 
     _renderItem({ item }) {
-        console.log(item)
         return (
             <LocalMediaElement
                 item={item}

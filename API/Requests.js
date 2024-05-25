@@ -39,7 +39,11 @@ function DownloadFileRequest(fileName){
     return url;
 }
 
+function UploadFileRequest(){
+    return `${ServerAddress}${Requests.upload}`
+}
 
 
 
-export {ServerAddress, ListMediaElements, StreamFileRequest, DownloadFileRequest}
+
+export {ServerAddress, ListMediaElements, StreamFileRequest, DownloadFileRequest, UploadFileRequest}

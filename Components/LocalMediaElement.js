@@ -1,6 +1,6 @@
 import SoundPlayer from "react-native-sound-player";
-import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
-import { DownloadFile } from "../API/FileTransfer";
+import { StreamFileRequest, DownloadFileRequest, UploadFileRequest } from "../API/Requests";
+import { DownloadFile, UploadFile } from "../API/FileTransfer";
 import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
@@ -68,19 +68,14 @@ export class LocalMediaElement extends PureComponent {
         }
     }
 
-    handleDownloadPress(fileName) {
-        try {
-            url = DownloadFileRequest(fileName);
-            console.log(url)
-            console.log(SyncDirectoryPath);
-            CheckDownloadsFolderExist().then((res) => console.log(res))
-            // createFileHierarchyFromName(SyncDirectoryPath)
-            DownloadFile(url, SyncDirectoryPath, fileName);
+    handleUploadPress() {
+        const url = UploadFileRequest();
 
-        }
-        catch (error) {
-            console.warn(error)
-        }
+        UploadFile(url, this.props.item.item, this.props.item.nameWithCatogry).then((res) => {
+            this.setState({
+                fileExists: res
+            });
+        })
     }
 
     render() {
@@ -89,7 +84,6 @@ export class LocalMediaElement extends PureComponent {
         const itemSeperated = item.split('/')
         const fileName = itemSeperated[itemSeperated.length - 1];
         const catogry = itemSeperated[1];
-        console.log(item)
         return (
             <View style={{ height: 50, borderColor: 'purple', borderWidth: 1, marginBottom: 5, borderRadius: 25 }}>
                 <View style={{ flexDirection: 'row', height: 50, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -98,7 +92,7 @@ export class LocalMediaElement extends PureComponent {
                     </View>
                     <View style={{ flexDirection: 'row' }}>
                         <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
-                        <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => {}} style={{ marginRight: 10 }}></Icon>
+                        <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => this.handleUploadPress()} style={{ marginRight: 10 }}></Icon>
                     </View>
                 </View>
             </View>
