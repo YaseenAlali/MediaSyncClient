@@ -1,6 +1,5 @@
 import {createContext} from 'react'
-const ServerMediaContext = createContext();
-const ClientMediaContext = createContext();
+const MediaContext = createContext();
 
 
-export {ServerMediaContext, ClientMediaContext};
+export {MediaContext};

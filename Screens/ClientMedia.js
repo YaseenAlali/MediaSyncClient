@@ -6,14 +6,12 @@ import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, ListFilesRecursive, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
 import PlayerControl from "../Components/PlayerControl";
 import SoundPlayer from "react-native-sound-player";
-import { ClientMediaContext, ServerMediaContext } from "../Contexts/Contexts";
+import {MediaContext } from "../Contexts/Contexts";
 import { LocalMediaElement } from "../Components/LocalMediaElement";
 
 export class ClientMedia extends PureComponent {
-    static contextType = ClientMediaContext;
+    static contextType = MediaContext;
     state = {
-        MediaElementsFetched: false,
-        items: [],
         refreshing: false,
     }
 
@@ -50,10 +48,8 @@ export class ClientMedia extends PureComponent {
     loadItems() {
         ListFilesRecursive(SyncDirectoryPath).then((result) => {
             const newItems = result.map((item, index) => ({ index, item : item.path, name : item.name, nameWithCatogry: item.nameWithCatogry }));
-            this.setState({
-                MediaElementsFetched: true,
-                items: newItems
-            });
+            this.context.setClientMediaItems(newItems);
+            this.context.setClientMediaFetched(true);
         }).catch((error) => {
             console.warn(error);
         })
@@ -97,21 +93,14 @@ export class ClientMedia extends PureComponent {
     }
 
     componentDidMount() {
-        this.context.setOnSearchItemPressedClient(() => this.onSearchItemPressed);
+        this.context.setOnClientSearchItemPressed(() => this.onSearchItemPressed);
         this.loadItems()
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.items !== prevState.items) {
-            this.context.setClientMediaItems(this.state.items);
-        }
-    }
 
     _onRefresh() {
-        this.setState({
-            MediaElementsFetched: false,
-            items: []
-        });
+        this.context.setClientMediaFetched(false);
+        this.context.setClientMediaItems([]);
         this.loadItems();
     }
 
@@ -172,7 +161,7 @@ export class ClientMedia extends PureComponent {
         SoundPlayer.pause()
     }
     onNext() {
-        const count = this.state.items.length;
+        const count = this.context.ClientMediaItems.length;
         if (this.StreamingItem.current != null) {
             const itemIndex = this.StreamingItem.current + 1;
             if (itemIndex != count) {
@@ -181,7 +170,6 @@ export class ClientMedia extends PureComponent {
         }
     }
     onPrev() {
-        const count = this.state.items.length;
         const currentIndex = this.StreamingItem.current;
         if (this.StreamingItem.current != null) {
             if (currentIndex != 0) {
@@ -192,7 +180,7 @@ export class ClientMedia extends PureComponent {
 
 
     render() {
-        if (!this.state.MediaElementsFetched) {
+        if (!this.context.ClientMediaFetched) {
             return (
                 <View>
                     <ActivityIndicator size={40} color={'purple'}></ActivityIndicator>
@@ -217,7 +205,7 @@ export class ClientMedia extends PureComponent {
                 <FlatList
                     ref={(ref) => { this.listRef = ref }}
                     renderItem={({ item }) => this._renderItem({ item })}
-                    data={this.state.items}
+                    data={this.context.ClientMediaItems}
                     keyExtractor={(item, index) => index.toString()}
                     getItemLayout={(data, index) => (
                         { length: 50, offset: 50 * index, index }
