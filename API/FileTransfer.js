@@ -32,19 +32,26 @@ async function DownloadFileTwo(url, path) {
   }
 }
 
-function DownloadFile(url, path, name = '') {
-
+async function DownloadFile(url, path, name = '') {
   let filePath = path + name;
-  console.log(filePath)
-  createFileHierarchyFromName(filePath).then(() => {
-    RNFS.downloadFile({
-      fromUrl: url,
-      toFile: filePath,
-    }).promise.then((r) => {
-      console.log(r.statusCode)
-    });
-  })
+  try {
+    await createFileHierarchyFromName(filePath);
+    try {
+      const response = await RNFS.downloadFile({
+        fromUrl: url,
+        toFile: filePath,
+      }).promise;
+      return response.statusCode == 200;
+    } catch (downloadError) {
+      console.warn(downloadError, "error in download file");
+      return false;
+    }
+  } catch (createError) {
+    console.warn(createError, "error in creating file hierarchy");
+    return false;
+  }
 }
+
 
 
 

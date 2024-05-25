@@ -1,7 +1,7 @@
 import RNFetchBlob from "rn-fetch-blob";
 var RNFS = require('react-native-fs');
 
-const ServerAddress = "http://192.168.1.79:5000/";
+const ServerAddress = "http://192.168.1.123:5000/";
 const Requests={
     stream : "stream",
     upload : "upload",

@@ -75,14 +75,16 @@ export class MediaElement extends PureComponent {
         }
     }
 
-    handleDownloadPress(fileName) {
+    handleDownloadPress() {
         try {
-            url = DownloadFileRequest(fileName);
-            console.log(url)
-            console.log(SyncDirectoryPath);
+            const item = this.props.item
+            url = DownloadFileRequest(item.item);
             CheckDownloadsFolderExist().then((res) => console.log(res))
-            // createFileHierarchyFromName(SyncDirectoryPath)
-            DownloadFile(url, SyncDirectoryPath, fileName);
+            DownloadFile(url, SyncDirectoryPath, item.item).then((res) => {
+                this.setState({
+                    fileExists: res
+                })
+            })
 
         }
         catch (error) {
