@@ -47,7 +47,13 @@ export class ClientMedia extends PureComponent {
 
     loadItems() {
         ListFilesRecursive(SyncDirectoryPath).then((result) => {
-            const newItems = result.map((item, index) => ({ index, item : item.path, name : item.name, nameWithCatogry: item.nameWithCatogry }));
+            const newItems = result.map((item, index) => ({ 
+                index,
+                item : item.path,
+                name : item.name, 
+                nameWithCatogry: item.nameWithCatogry,
+                itemExists : this.context.ServerMediaItems.find(x => x.item == "/" + item.nameWithCatogry) != null
+            }));
             this.context.setClientMediaItems(newItems);
             this.context.setClientMediaFetched(true);
         }).catch((error) => {

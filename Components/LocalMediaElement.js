@@ -14,7 +14,7 @@ export class LocalMediaElement extends PureComponent {
     }
     state = {
         isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
-        fileExists: false,
+        fileExists: this.props.item.itemExists,
     }
 
     startPlaying() { }
@@ -34,13 +34,6 @@ export class LocalMediaElement extends PureComponent {
         }
     }
 
-    componentDidMount() {
-        checkFileExists(SyncDirectoryPath + this.props.item.item).then((result) => {
-            this.setState({
-                fileExists: result
-            });
-        })
-    }
 
 
     playVideo() {
