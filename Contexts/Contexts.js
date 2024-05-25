@@ -1,5 +1,3 @@
 import {createContext} from 'react'
-const MediaContext = createContext();
-
-
-export {MediaContext};
+const AppContext = createContext();
+export {AppContext};

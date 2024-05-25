@@ -5,11 +5,10 @@ const { View, Text, FlatList, TouchableOpacity, ActivityIndicator } = require("r
 import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
 import PlayerControl from "../Components/PlayerControl";
-import SoundPlayer from "react-native-sound-player";
-import { MediaContext } from "../Contexts/Contexts";
+import { AppContext } from "../Contexts/Contexts";
 
 export class ServerMedia extends PureComponent {
-    static contextType = MediaContext;
+    static contextType = AppContext;
     state = {
         refreshing: false,
     }
@@ -149,28 +148,25 @@ export class ServerMedia extends PureComponent {
         })
     }
 
-    onPlay() {
-        SoundPlayer.resume();
-    }
-    onPause() {
-        SoundPlayer.pause()
-    }
     onNext() {
         const count = this.context.ServerMediaItems.length;
-        if (this.StreamingItem.current != null) {
-            const itemIndex = this.StreamingItem.current + 1;
-            if (itemIndex != count){
-                this.cellRefs[itemIndex].playVideo();
-            }
+        const index = this.context.ServerTrackIndex + 1 >= count ? 0 : this.context.ServerTrackIndex + 1;
+        const cell = this.cellRefs[index];
+        if (cell) {
+            this.listRef.scrollToIndex({ index: index, animated: true });
+            setTimeout(() => {
+                cell?.playVideo();
+            }, 100);
         }
     }
     onPrev() {
-        const currentIndex = this.StreamingItem.current;
-        if (this.StreamingItem.current != null) {
-            if (currentIndex != 0){
-                this.cellRefs[currentIndex - 1].playVideo();
-            }
-        }
+        const count = this.context.ServerMediaItems.length;
+        const index = this.context.ServerTrackIndex - 1 < 0 ? count - 1 : this.context.ServerTrackIndex - 1;
+        const cell = this.cellRefs[index];
+        this.listRef.scrollToIndex({ index: index, animated: true });
+        setTimeout(() => {
+            cell?.playVideo();
+        }, 100)
     }
 
 
@@ -193,9 +189,8 @@ export class ServerMedia extends PureComponent {
                 <PlayerControl
                     ref={(ref) => { this.PlayerControlRef = ref }}
                     onNext={this.onNext}
-                    onPause={this.onPause}
-                    onPlay={this.onPlay}
                     onPrev={this.onPrev}
+                    serverPlayerControl={true}
                 ></PlayerControl>
                 <FlatList
                     ref={(ref) => { this.listRef = ref}}

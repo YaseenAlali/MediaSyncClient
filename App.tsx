@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   PermissionsAndroid,
@@ -32,6 +32,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ClientMedia } from './Screens/ClientMedia';
 import NavigationTabs from './navigation/Tabs';
+import TrackPlayer from 'react-native-track-player';
 
 
 
@@ -71,60 +72,33 @@ const Tab = createBottomTabNavigator();
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [Loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    askForStoragePermissions().then((result) => {
-      console.log(GetStorageRootPath());
-    })
-    CreateDownloadsFolderIfDoesntExist().then(() => console.log("Created directory"));
-  }, [])
+    const setupPlayer = async () => {
+      await askForStoragePermissions().then((result) => {
+        console.log(GetStorageRootPath());
+      });
+      await TrackPlayer.setupPlayer();
+      await CreateDownloadsFolderIfDoesntExist().then(() => console.log("Created directory"));
+      setLoaded(true);
+    };
+  
+    setupPlayer();
+  }, []);
   
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+  if (!Loaded) {
+    return (<View></View>);
+  }
 
   return (
     <NavigationContainer>
         <NavigationTabs></NavigationTabs>
-      {/* <Tab.Navigator>
-        <Tab.Screen name="Server" component={ServerMedia} />
-        <Tab.Screen name="Device" component={ClientMedia} />
-      </Tab.Navigator> */}
     </NavigationContainer>
-  // );
-    // <View/>
-    // <ServerMedia></ServerMedia>
-    // <SafeAreaView style={backgroundStyle}>
-    //   <StatusBar
-    //     barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-    //     backgroundColor={backgroundStyle.backgroundColor}
-    //   />
-    //   <ScrollView
-    //     contentInsetAdjustmentBehavior="automatic"
-    //     style={backgroundStyle}>
-    //     <Header />
-    //     <View
-    //       style={{
-    //         backgroundColor: isDarkMode ? Colors.black : Colors.white,
-    //       }}>
-    //       <Section title="Step One">
-    //         Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-    //         screen and then come back to see your edits.
-    //       </Section>
-    //       <Section title="See Your Changes">
-    //         <ReloadInstructions />
-    //       </Section>
-    //       <Section title="Debug">
-    //         <DebugInstructions />
-    //       </Section>
-    //       <Section title="Learn More">
-    //         Read the docs to discover what to do next:
-    //       </Section>
-    //       <LearnMoreLinks />
-    //     </View>
-    //   </ScrollView>
-    // </SafeAreaView>
   );
 }
 

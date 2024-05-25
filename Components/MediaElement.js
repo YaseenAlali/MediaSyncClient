@@ -1,32 +1,24 @@
-import SoundPlayer from "react-native-sound-player";
 import { StreamFileRequest, DownloadFileRequest } from "../API/Requests";
 import { DownloadFile } from "../API/FileTransfer";
 import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
 import Icon from 'react-native-vector-icons/FontAwesome';
+import TrackPlayer, { Event } from "react-native-track-player";
+import { AppContext } from "../Contexts/Contexts";
 
 
 export class MediaElement extends PureComponent {
     constructor(props) {
         super(props)
-        this.audio = null;
     }
     state = {
-        isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
         fileExists: false,
     }
 
-    startPlaying() { }
 
-    stopPlaying() {
-        console.log("Stopped", this.props.item.index);
-        this.setState({
-            isStreaming: false
-        });
-        this.removeSub();
-        console.log(this.audio)
-    }
+    static contextType = AppContext
+
 
     removeSub() {
         if (this.audio && this.audio.remove) {
@@ -45,18 +37,16 @@ export class MediaElement extends PureComponent {
 
     playVideo() {
         try {
-            this.removeSub();
             const item = this.props.item.item;
             StreamFileRequest(item).then(async (url) => {
-                SoundPlayer.playUrl(url);
-                console.log(url);
-                this.setState({
-                    isStreaming: true
-                })
-                this.props.onStreamButtonPress(this.props.item.index);
-                this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
-                    console.log('finished playing', success, this.props.item.index);
-                    this.props.onMediaFinishedPlaying();
+                TrackPlayer.reset().then(() => {
+                    TrackPlayer.add({
+                        url: url
+                    })
+
+                    TrackPlayer.play();
+                    this.context.setIsPlaying(true);
+                    this.context.setServerTrackIndex(this.props.item.index);
                 })
             });
 
@@ -105,7 +95,7 @@ export class MediaElement extends PureComponent {
                         <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
+                        <Icon color={this.context.ServerTrackIndex == this.props.item.index ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
                         <Icon color={this.state.fileExists ? 'green' : 'red'} name='download' size={30} onPress={() => this.handleDownloadPress()} style={{ marginRight: 10 }}></Icon>
                     </View>
                 </View>

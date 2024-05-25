@@ -1,50 +1,36 @@
-import SoundPlayer from "react-native-sound-player";
-import { StreamFileRequest, DownloadFileRequest, UploadFileRequest } from "../API/Requests";
-import { DownloadFile, UploadFile } from "../API/FileTransfer";
-import { CheckDownloadsFolderExist, SyncDirectoryPath, checkFileExists, createFileHierarchyFromName } from "../FileSystem/FileSystemUtils";
+import { UploadFileRequest } from "../API/Requests";
+import { UploadFile } from "../API/FileTransfer";
+import Icon from 'react-native-vector-icons/FontAwesome';
+import TrackPlayer from "react-native-track-player";
+import { AppContext } from "../Contexts/Contexts";
 const { PureComponent } = require("react");
 const { View, Text, TouchableOpacity } = require("react-native");
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 export class LocalMediaElement extends PureComponent {
     constructor(props) {
         super(props)
-        this.audio = null;
     }
     state = {
-        isStreaming: this.props.GetIsItemBeingPlayed(this.props.item.index),
         fileExists: this.props.item.itemExists,
     }
+    static contextType = AppContext;
 
-    startPlaying() { }
 
-    stopPlaying() {
-        console.log("Stopped", this.props.item.index);
-        this.setState({
-            isStreaming: false
-        });
-        this.removeSub();
-        console.log(this.audio)
-    }
 
-    removeSub() {
-        if (this.audio && this.audio.remove) {
-            this.audio.remove();
-        }
-    }
 
 
 
     playVideo() {
         try {
-            this.removeSub();
-            const item = this.props.item.item;
-            SoundPlayer.playUrl(item);
-            this.setState({ isStreaming: true });
-            this.props.onStreamButtonPress(this.props.item.index);
-            this.audio = SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
-                this.props.onMediaFinishedPlaying();
+            TrackPlayer.reset().then(() => {
+                TrackPlayer.add({
+                    url: this.props.item.item
+                })
+
+                TrackPlayer.play();
+                this.context.setIsPlaying(true);
+                this.context.setClientTrackIndex(this.props.item.index);
             })
         }
         catch (error) {
@@ -73,7 +59,6 @@ export class LocalMediaElement extends PureComponent {
 
     render() {
         const item = this.props.item.item;
-        // console.log(item)
         const itemSeperated = item.split('/')
         const fileName = itemSeperated[itemSeperated.length - 1];
         const catogry = itemSeperated[1];
@@ -84,7 +69,7 @@ export class LocalMediaElement extends PureComponent {
                         <Text style={{ marginLeft: 10 }} numberOfLines={3}>{fileName}</Text>
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Icon color={this.state.isStreaming ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
+                        <Icon color={this.context.ClientTrackIndex == this.props.item.index ? 'green' : 'white'} name='play' size={30} onPress={() => this.handleStreamPress()} style={{ marginRight: 10 }}></Icon>
                         <Icon color={this.state.fileExists ? 'green' : 'red'} name='upload' size={30} onPress={() => this.handleUploadPress()} style={{ marginRight: 10 }}></Icon>
                     </View>
                 </View>

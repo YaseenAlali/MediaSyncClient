@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, FlatList } from 'react-native';
-import { MediaContext} from '../Contexts/Contexts';
-import MediaProviders from '../Providers/MediaProviders';
+import { AppContext} from '../Contexts/Contexts';
+import AppProvider from '../Providers/AppProvider';
 
 class SearchButton extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class SearchButton extends React.Component {
       results: [],
     };
     this.searchingServer = this.props.searchingServer;
-    this.constructor.contextType = MediaContext;
+    this.constructor.contextType = AppContext;
   }
 
 
@@ -35,7 +35,7 @@ class SearchButton extends React.Component {
   render() {
     if (this.searchingServer) //<=temp
       return (
-        <MediaProviders>
+        <AppProvider>
           <View style={{ flexDirection: 'column', alignItems: 'center', marginRight: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               {this.state.isSearchActive && (
@@ -95,11 +95,11 @@ class SearchButton extends React.Component {
               </View>
             )}
           </View>
-        </MediaProviders>
+        </AppProvider>
       );
 
     return (
-      <MediaProviders>
+      <AppProvider>
         <View style={{ flexDirection: 'column', alignItems: 'center', marginRight: 10 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {this.state.isSearchActive && (
@@ -159,7 +159,7 @@ class SearchButton extends React.Component {
             </View>
           )}
         </View>
-      </MediaProviders>
+      </AppProvider>
     );
   }
 }

@@ -1,34 +1,27 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { AppContext } from '../Contexts/Contexts';
 
 class PlayerControl extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   state = {
-    isPlaying: false,
     repeatMode: 'playlist'
   };
+
+  static contextType = AppContext;
+
 
   getRepeatMode(){
     const repeatMode = this.state.repeatMode;
     return repeatMode;
   }
 
-  togglePlayState(value) {
-    this.setState({
-      isPlaying: value
-    });
-  }
-
   handlePlayPause = () => {
-    const { onPlay, onPause } = this.props;
-    this.setState(prevState => {
-      if (prevState.isPlaying) {
-        onPause();
-      } else {
-        onPlay();
-      }
-      return { isPlaying: !prevState.isPlaying };
-    });
+    const {IsPlaying, setIsPlaying} = this.context;
+    setIsPlaying(!IsPlaying);
   };
 
   handleRepeat = () => {
@@ -53,12 +46,12 @@ class PlayerControl extends React.Component {
 
   render() {
     const { onNext, onPrev } = this.props;
-    const { isPlaying } = this.state;
+    const { IsPlaying } = this.context;
 
     return (
       <View style={styles.container}>
         <Icon name="backward" size={30} onPress={onPrev} />
-        {isPlaying ?
+        {IsPlaying ?
           (
             <Icon name="pause" size={30} onPress={this.handlePlayPause} />
           )

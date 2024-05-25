@@ -5,12 +5,11 @@ const { View, Text, FlatList, TouchableOpacity, ActivityIndicator } = require("r
 import { MediaElement } from "../Components/MediaElement";
 import { GetStorageRootPath, ListFilesRecursive, SyncDirectoryPath, setSyncDirectory } from "../FileSystem/FileSystemUtils";
 import PlayerControl from "../Components/PlayerControl";
-import SoundPlayer from "react-native-sound-player";
-import {MediaContext } from "../Contexts/Contexts";
+import { AppContext } from "../Contexts/Contexts";
 import { LocalMediaElement } from "../Components/LocalMediaElement";
 
 export class ClientMedia extends PureComponent {
-    static contextType = MediaContext;
+    static contextType = AppContext;
     state = {
         refreshing: false,
     }
@@ -47,12 +46,12 @@ export class ClientMedia extends PureComponent {
 
     loadItems() {
         ListFilesRecursive(SyncDirectoryPath).then((result) => {
-            const newItems = result.map((item, index) => ({ 
+            const newItems = result.map((item, index) => ({
                 index,
-                item : item.path,
-                name : item.name, 
+                item: item.path,
+                name: item.name,
                 nameWithCatogry: item.nameWithCatogry,
-                itemExists : this.context.ServerMediaItems.find(x => x.item == "/" + item.nameWithCatogry) != null
+                itemExists: this.context.ServerMediaItems.find(x => x.item == "/" + item.nameWithCatogry) != null
             }));
             this.context.setClientMediaItems(newItems);
             this.context.setClientMediaFetched(true);
@@ -121,16 +120,6 @@ export class ClientMedia extends PureComponent {
                 onStreamButtonPress={this._onStreamButtonPress}
 
             ></LocalMediaElement>
-            // <MediaElement
-            //     item={item}
-            //     onStreamButtonPress={this._onStreamButtonPress}
-            //     ref={(ref) => {
-            //         this.cellRefs[item.index] = ref;
-            //     }}
-            //     GetIsItemBeingPlayed={this.GetIsItemBeingPlayed}
-            //     onMediaFinishedPlaying={this.onMediaFinishedPlaying}
-            // >
-            // </MediaElement>
         )
     }
 
@@ -160,28 +149,23 @@ export class ClientMedia extends PureComponent {
         })
     }
 
-    onPlay() {
-        SoundPlayer.resume();
-    }
-    onPause() {
-        SoundPlayer.pause()
-    }
     onNext() {
         const count = this.context.ClientMediaItems.length;
-        if (this.StreamingItem.current != null) {
-            const itemIndex = this.StreamingItem.current + 1;
-            if (itemIndex != count) {
-                this.cellRefs[itemIndex].playVideo();
-            }
-        }
+        const index = this.context.ClientTrackIndex + 1 >= count ? 0 : this.context.ClientTrackIndex + 1;
+        const cell = this.cellRefs[index];
+        this.listRef.scrollToIndex({ index: index, animated: true });
+        setTimeout(() => {
+            cell?.playVideo();
+        }, 100);
     }
     onPrev() {
-        const currentIndex = this.StreamingItem.current;
-        if (this.StreamingItem.current != null) {
-            if (currentIndex != 0) {
-                this.cellRefs[currentIndex - 1].playVideo();
-            }
-        }
+        const currentIndex = this.context.ClientTrackIndex;
+        const index = currentIndex - 1 < 0 ? this.context.ClientMediaItems.length - 1 : currentIndex - 1;
+        const cell = this.cellRefs[index];
+        this.listRef.scrollToIndex({ index: index, animated: true });
+        setTimeout(() => {
+            cell?.playVideo();
+        }, 100)
     }
 
 
@@ -207,6 +191,7 @@ export class ClientMedia extends PureComponent {
                     onPause={this.onPause}
                     onPlay={this.onPlay}
                     onPrev={this.onPrev}
+                    clientPlayerControl={true}
                 ></PlayerControl>
                 <FlatList
                     ref={(ref) => { this.listRef = ref }}
