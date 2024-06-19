@@ -7,6 +7,7 @@ const Requests={
     upload : "upload",
     download : "download",
     list : "list",
+    downloadYoutube : "fetch",
     cleanup : "cleanup"
 }
 async function ListMediaElements(){
@@ -43,7 +44,11 @@ function UploadFileRequest(){
     return `${ServerAddress}${Requests.upload}`
 }
 
+function DownloadFromYoutubeRequest(url = ''){
+    return `${ServerAddress}${Requests.downloadYoutube}?url=${url}`
+}
 
 
 
-export {ServerAddress, ListMediaElements, StreamFileRequest, DownloadFileRequest, UploadFileRequest}
+
+export {ServerAddress, ListMediaElements, StreamFileRequest, DownloadFileRequest, UploadFileRequest, DownloadFromYoutubeRequest}

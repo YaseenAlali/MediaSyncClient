@@ -6,6 +6,7 @@ import { View } from 'react-native'
 import SearchButton from '../Components/SearchButton';
 import { SettingsScreen } from '../Screens/SettingsScreen';
 import AppProvider from '../Providers/AppProvider';
+import { Youtube } from '../Screens/Youtube';
 const Tab = createBottomTabNavigator();
 
 function NavigationTabs() {
@@ -23,6 +24,9 @@ function NavigationTabs() {
               }
               else if (route.name === 'Settings') {
                 iconName = 'gear';
+              }
+              else if (route.name === 'Youtube') {
+                iconName = 'youtube';
               }
 
               return <Icon name={iconName} size={size} color={color} />;
@@ -77,6 +81,22 @@ function NavigationTabs() {
               }
             }}
           />
+          <Tab.Screen
+            name='Youtube'
+            component={Youtube}
+            options={{
+              headerTitleStyle: { color: 'purple' },
+              headerBackground: () => {
+                return (
+                  <View style={{ backgroundColor: 'black', flex: 1, alignItems: 'center', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                    <View style={{ borderColor: 'purple', borderWidth: 1, borderRadius: 25, position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+
+                    </View>
+                  </View>
+                )
+              }
+            }}
+          ></Tab.Screen>
           <Tab.Screen
             name='Settings'
             component={SettingsScreen}

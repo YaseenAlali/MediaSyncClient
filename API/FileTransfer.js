@@ -40,6 +40,9 @@ async function DownloadFile(url, path, name = '') {
       const response = await RNFS.downloadFile({
         fromUrl: url,
         toFile: filePath,
+        connectionTimeout : 120000,
+        readTimeout : 120000,
+        backgroundTimeout : 120000
       }).promise;
       return response.statusCode == 200;
     } catch (downloadError) {
